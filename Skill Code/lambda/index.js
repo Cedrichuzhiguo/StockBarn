@@ -57,7 +57,7 @@ const LaunchRequestHandler = {
   },
 };
 
-const CaputureStockIDIntentHandler = {
+const CaputureStockSymbolIntentHandler = {
    
     async canHandle(handlerInput){
        console.log("envelope:", handlerInput.requestEnvelope);
@@ -648,7 +648,7 @@ new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTEN
   .addRequestHandlers(
     HasStockDataLaunchRequestHandler,
     LaunchRequestHandler,
-    CaputureStockIDIntentHandler,
+    CaputureStockSymbolIntentHandler,
     QuizHandler,
     DefinitionHandler,
     QuizAnswerHandler,
