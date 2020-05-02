@@ -49,7 +49,7 @@ const LaunchRequestHandler = {
   },
   handle(handlerInput) {
     const welcomeMessage = 'Hello! Welcome to Stock Barn! I help you manage your stocks. To get it started, you can tell me which stock are you interested in?' 
-    const helpMessage = 'For example, ou can say TESLA, or T-S-L-A!'
+    const helpMessage = 'For example, you can say TESLA, or T-S-L-A!'
     return handlerInput.responseBuilder
       .speak(welcomeMessage)
       .reprompt(helpMessage)
@@ -62,19 +62,19 @@ const CaputureStockIDIntentHandler = {
     async canHandle(handlerInput){
        console.log("envelope:", handlerInput.requestEnvelope);
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'CaptureStockID';
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'CaptureStockSymbol';
     },
     async handle(handlerInput){
-        const stockID = handlerInput.requestEnvelope.request.intent.slots.stockID.value;
+        const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
         
         const attributesManager = handlerInput.attributesManager;
         const stockAttributes = {
-            "stocks": [stockID]
+            "stocks": [stockSymbol]
             }
         attributesManager.setPersistentAttributes(stockAttributes);
         await attributesManager.savePersistentAttributes();
         
-        const speakOutput = `Gotcha, ${stockID}!`;
+        const speakOutput = `Got it, ${stockSymbol}!`;
         const helpMessage = 'Would you like to add another one?'
         return handlerInput.responseBuilder
           .speak(speakOutput)
