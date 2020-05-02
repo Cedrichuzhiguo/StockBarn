@@ -1,0 +1,43 @@
+{
+  "manifest": {
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:706525259074:function:7b5bcd79-a8b4-4dd1-87d5-20a53d447a28:Release_0"
+        },
+        "interfaces": []
+      }
+    },
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "locales": {
+        "en-US": {}
+      }
+    },
+    "publishingInformation": {
+      "automaticDistribution": {
+        "isActive": false
+      },
+      "category": "KNOWLEDGE_AND_TRIVIA",
+      "distributionCountries": [],
+      "isAvailableWorldwide": true,
+      "locales": {
+        "en-US": {
+          "description": "Test your knowledge of the US states and their capitals.\n\nStates Quiz provides a fun way to keep your U.S. geography skills sharp.\n\nTo start, just say \"Alexa, launch States Quiz\" or \"Alexa, open States Quiz\" to start the game\".\n\nAt anytime, you can stop the game by saying \"Alexa, stop\"",
+          "examplePhrases": [
+            "Alexa, open stock star",
+            "Alexa, ask stock star"
+          ],
+          "keywords": [
+            "quiz",
+            "games",
+            "geography"
+          ],
+          "name": "Stock Assistant",
+          "summary": "Test your knowledge of the US states and their capitals."
+        }
+      },
+      "testingInstructions": "Include your testing instruction (if any) here"
+    }
+  }
+}
