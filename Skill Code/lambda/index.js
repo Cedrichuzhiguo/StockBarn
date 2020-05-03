@@ -152,6 +152,46 @@ const CheckStockPriceHandler = {
   },
 };
 
+
+const CheckPortofolioIntentHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    console.log("Inside CheckPortofolioIntentHandler");
+    console.log(JSON.stringify(request));
+    
+
+    return request.type === "IntentRequest" &&
+           (request.intent.name === "CheckPortofolioIntent");
+  },
+  async handle(handlerInput) {
+    console.log("Inside CheckPortofolioIntentHandler - handle");
+
+    const response = handlerInput.responseBuilder;
+
+    const stocks = await getPersistedStockList(handlerInput);
+
+    const stockNum = stocks.length ;
+
+    let speakOutput = `You currently have ${stockNum} in your portofolio. Here is the current prices:`;
+
+    for (stock of stocks){
+      const priceInfo = await getStockPrice(stock.id);
+      let price = priceInfo.c || 0.0;
+      speakOutput += `${stock.name}: ${price} USD; `;
+    }
+    if (supportsDisplay(handlerInput)) {
+        console.log('Do nothing for now. Might want to expand here');
+    }
+
+
+    return response.speak(speakOutput)
+                   .reprompt(suggestAccountLink)
+                   .getResponse();
+  },
+};
+
+
+
 const DefinitionHandler = {
   canHandle(handlerInput) {
     console.log("Inside DefinitionHandler");
@@ -391,8 +431,7 @@ const sessionAttribute = {
 };
 
 
-const welcomeMessage = `Welcome to the United States Quiz Game!  You can ask me about any of the fifty states and their capitals, or you can ask me to start a quiz.  What would you like to do?`;
-const startQuizMessage = `OK.  I will ask you 10 questions about the United States. `;
+const suggestAccountLink = 'Do you think I\'m helpful enough? I can help you even more, if you link with a Stock Ninja account.';
 const exitSkillMessage = `Thank you for using stock ninja! You'll make a lot money soon!`;
 const repromptSpeech = `Which other state or capital would you like to know about?`;
 const helpMessage = `I am stock ninja, help you manage your portofolio. For example, you can ask, check price of amazon.`;
