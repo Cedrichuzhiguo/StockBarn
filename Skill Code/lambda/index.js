@@ -13,12 +13,13 @@ const https = require('https');
 const LoadStockDataInterceptor = {
     async process(handlerInput) {
         const attributesManager = handlerInput.attributesManager;
-        const sessionAttributes = await attributesManager.getPersistentAttributes() || {};
+        const persistedAttributes = await attributesManager.getPersistentAttributes() || {};
 
-      //  const stocks = sessionAttributes.hasOwnProperty('stocks') ? sessionAttributes.stocks : [];
+        const stocks = persistedAttributes.stocks || [];
+        console.log(`Current stocks: ${stocks}`);
 
 
-        attributesManager.setSessionAttributes(sessionAttributes);
+        attributesManager.setSessionAttributes(persistedAttributes);
 
     }
 };
@@ -27,16 +28,17 @@ const LoadStockDataInterceptor = {
 
 /* INTENT HANDLERS */
 const HasStockDataLaunchRequestHandler = {
-    canHandle(handlerInput) {
+    async canHandle(handlerInput) {
 
-        const stocks = getPersistedStockList(handlerInput);
+        const stocks = await getPersistedStockList(handlerInput);
 
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest' && (stocks.length>0);
     },
-    handle(handlerInput) {
-      const stocks = getPersistedStockList(handlerInput);
+    async handle(handlerInput) {
+      const stocks = await getPersistedStockList(handlerInput);
 
       const stockNum = stocks.length ;
+
       if(stockNum===1){
         const stock = stocks[0];
         const speakOutput = `Welcome back.  You currently have ${stock} in your stock list. Do you like me to check the latest price?`;
@@ -76,7 +78,7 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === `LaunchRequest` ;
   },
   handle(handlerInput) {
-    const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help you manage your stock portofolio. To get it started, you can tell me which stock are you interested in?' 
+    const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help you manage your investment portofolio. To get it started, you can tell me which stock are you interested in?' 
     const helpMessage = 'For example, you can say TESLA, or T-S-L-A!'
     return handlerInput.responseBuilder
     .addDelegateDirective({
@@ -92,18 +94,19 @@ const LaunchRequestHandler = {
 
 const AddStockToListIntentHandler = {
    
-    async canHandle(handlerInput){
+    canHandle(handlerInput){
        console.log("envelope:", handlerInput.requestEnvelope);
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AddStockToListIntent';
     },
     async handle(handlerInput){
-        const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
-        
-       saveToPersistStockList(handlerInput, stockSymbol);
+      console.log("Inside AddStockToListIntentHandler");
+      const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
+      console.log(`Now, add ${stockSymbol} to the list`);  
+      const stocks = await saveToPersistStockList(handlerInput, stockSymbol);
         
    //     const speakOutput = `Got it, ${stockSymbol}!`;
-        const speakOutput = 'Would you like to add another one?'
+        const speakOutput = `Now, you have ${stocks.length} in your list in total. Would you like to add another one?`
         return handlerInput.responseBuilder
           .speak(speakOutput)
       //    .reprompt(helpMessage)
@@ -129,7 +132,7 @@ const CheckStockPriceHandler = {
   },
   async handle(handlerInput) {
     console.log("Inside CheckStockPriceHandler - handle");
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
     const response = handlerInput.responseBuilder;
     const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
 
@@ -138,11 +141,7 @@ const CheckStockPriceHandler = {
     let price = priceInfo.c || 1.0;
 
     let speakOutput = `Current stock price for ${stockSymbol} is: ${price} USD`;
-  //  var repromptOutput = '';
 
-
-
-    
     if (supportsDisplay(handlerInput)) {
         console.log('Do nothing for now. Might want to expand here');
     }
@@ -406,6 +405,7 @@ async function getPersistedStockList(handlerInput){
   const persistedAttributes = await attributesManager.getPersistentAttributes() || {};
 
   const stocks =  persistedAttributes.stocks || [];
+  console.log(`Read stocks: ${stocks}`);
   return stocks;
 }
 
@@ -413,12 +413,14 @@ async function saveToPersistStockList(handlerInput, stockSymbol){
   const attributesManager = handlerInput.attributesManager;
   let persistedAttributes = await attributesManager.getPersistentAttributes() || {};
 
-  const stocks = persistedAttributes.stocks || [];
+  let stocks = persistedAttributes.stocks || [];
   stocks.push(stockSymbol);
   persistedAttributes.stocks = stocks ;
 
   attributesManager.setPersistentAttributes(persistedAttributes);
   await attributesManager.savePersistentAttributes();
+  console.log(`Saved stocks: ${stocks}`);
+  return stocks;
 }
 
 // returns true if the skill is running on a device with a display (show|spot)
