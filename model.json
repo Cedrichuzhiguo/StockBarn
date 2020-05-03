@@ -28,20 +28,26 @@
                     "samples": []
                 },
                 {
-                    "name": "CaptureStockSymbol",
+                    "name": "AddStockToListIntent",
                     "slots": [
                         {
                             "name": "stockSymbol",
-                            "type": "STOCK_SYMBOL"
+                            "type": "STOCK_SYMBOL",
+                            "samples": [
+                                "can you please add {stockSymbol}",
+                                "{stockSymbol} please",
+                                "add {stockSymbol} to the list",
+                                "add {stockSymbol}",
+                                "{stockSymbol}"
+                            ]
                         }
                     ],
                     "samples": [
-                        "I have {stockSymbol}",
-                        "I have {stockSymbol} in my portofolio",
-                        "{stockSymbol} is great",
-                        "I like {stockSymbol}",
-                        "I want to buy {stockSymbol}",
-                        "I'm interested in {stockSymbol}"
+                        "add {stockSymbol} to my portofolio",
+                        "add {stockSymbol} to the list",
+                        "put {stockSymbol} on my list",
+                        "add {stockSymbol} please",
+                        "add {stockSymbol} to my list"
                     ]
                 },
                 {
@@ -55,6 +61,7 @@
                             "name": "stockSymbol",
                             "type": "STOCK_SYMBOL",
                             "samples": [
+                                "{stockSymbol}",
                                 "What about {stockSymbol}",
                                 "Please check {stockSymbol}",
                                 "I like to check {stockSymbol}"
@@ -62,6 +69,7 @@
                         }
                     ],
                     "samples": [
+                        "What about {stockSymbol}",
                         "how much is {stockSymbol} ",
                         "please check {stockSymbol}",
                         "check {stockSymbol} please",
@@ -331,7 +339,10 @@
                         {
                             "id": "FB",
                             "name": {
-                                "value": "Facebook"
+                                "value": "Facebook",
+                                "synonyms": [
+                                    "facebook"
+                                ]
                             }
                         },
                         {
@@ -343,7 +354,10 @@
                         {
                             "id": "AMZN",
                             "name": {
-                                "value": "AMAZON"
+                                "value": "Amazon",
+                                "synonyms": [
+                                    "amazon"
+                                ]
                             }
                         },
                         {
@@ -377,12 +391,19 @@
                             "elicitationRequired": true,
                             "prompts": {
                                 "elicitation": "Elicit.Slot.1301132670653.1459658627492"
-                            }
+                            },
+                            "validations": [
+                                {
+                                    "type": "hasEntityResolutionMatch",
+                                    "prompt": "Slot.Validation.765626182885.591076655024.416737660356"
+                                }
+                            ]
                         }
                     ]
                 },
                 {
-                    "name": "CaptureStockSymbol",
+                    "name": "AddStockToListIntent",
+                    "delegationStrategy": "ALWAYS",
                     "confirmationRequired": false,
                     "prompts": {},
                     "slots": [
@@ -390,8 +411,16 @@
                             "name": "stockSymbol",
                             "type": "STOCK_SYMBOL",
                             "confirmationRequired": false,
-                            "elicitationRequired": false,
-                            "prompts": {}
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.1307883610588.1492087604695"
+                            },
+                            "validations": [
+                                {
+                                    "type": "hasEntityResolutionMatch",
+                                    "prompt": "Slot.Validation.596849223745.1007469412030.1125897919740"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -405,6 +434,50 @@
                     {
                         "type": "PlainText",
                         "value": "which stock do you want to check?"
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.765626182885.591076655024.416737660356",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "{stockSymbol} is not a valid stock name or symbol"
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.596849223745.1007469412030.1125897919740",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "{stockSymbol} is not a valid stock in this skill. I can only support FAANG stocks at this moment."
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.1307883610588.1492087604695",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "For example, you can say Apple, or A-P-P-L. "
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "which stock do you want to add to the list?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.1307883610588",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "{stockSymbol} , good choice"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "Got it, {stockSymbol}"
                     }
                 ]
             }
