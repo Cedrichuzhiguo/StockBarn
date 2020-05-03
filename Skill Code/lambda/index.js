@@ -139,7 +139,7 @@ const CheckStockPriceHandler = {
     const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
 
 
-    const priceInfo = await getStockPrice('AAPL');
+    const priceInfo = await getStockPrice(stockSymbol);
     let price = priceInfo.c || 1.0;
 
     let speakOutput = `Current stock price for ${stockSymbol} is: ${price} USD`;
@@ -206,7 +206,7 @@ const CheckPortofolioIntentHandler = {
     let speakOutput = `You currently have ${stockNum} in your portofolio. Here is the current prices:`;
 
     for (stock of stocks){
-      const priceInfo = await getStockPrice(stock.id);
+      const priceInfo = await getStockPrice(stock);
       let price = priceInfo.c || 0.0;
       speakOutput += `${stock.name}: ${price} USD; `;
     }
@@ -409,6 +409,7 @@ function supportsDisplay(handlerInput) {
   return hasDisplay;
 }
 
+
 function getBadAnswer(item) {
   return `I'm sorry. ${item} is not something I know very much about in this skill. ${helpMessage}`;
 }
@@ -506,10 +507,28 @@ function isAttributeEqualsToValue(handlerInput, attributeName, value){
   return value == currentValue ;
 }
 
+const stock_to_tickers = {
+  facebook: 'FB',
+  amazon: 'AMZN',
+  apple: 'APPL',
+  netflix:'NFLX',
+  google: 'GOOG',
+  tesla: 'TSLA'
+
+}
+function getStockTickerSymbol(stockName){
+    return stock_to_tickers[stockName];
+}
+
 
 //https://finnhub.io/api/v1/quote?symbol=AAPL&token=bqn2eh7rh5re7283jbh0
- function getStockPrice(symbol) {
-     return new Promise(((resolve, reject) => {
+ function getStockPrice(stockName) {
+    let symbol = getStockTickerSymbol (stockName);
+    if (!symbol){
+      console.log(`Can not find the symbol for ${stockName}`);
+      return null;
+    }
+    return new Promise(((resolve, reject) => {
     var options = {
         host: 'finnhub.io',
         path: `/api/v1/quote?symbol=${symbol}&token=bqn2eh7rh5re7283jbh0`,
