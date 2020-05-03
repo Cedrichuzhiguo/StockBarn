@@ -53,7 +53,12 @@
                     "slots": [
                         {
                             "name": "stockSymbol",
-                            "type": "STOCK_SYMBOL"
+                            "type": "STOCK_SYMBOL",
+                            "samples": [
+                                "What about {stockSymbol}",
+                                "Please check {stockSymbol}",
+                                "I like to check {stockSymbol}"
+                            ]
                         }
                     ],
                     "samples": [
@@ -356,6 +361,53 @@
                     ]
                 }
             ]
-        }
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "CheckPriceIntent",
+                    "delegationStrategy": "ALWAYS",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "stockSymbol",
+                            "type": "STOCK_SYMBOL",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.1301132670653.1459658627492"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "CaptureStockSymbol",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "stockSymbol",
+                            "type": "STOCK_SYMBOL",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
+                        }
+                    ]
+                }
+            ],
+            "delegationStrategy": "ALWAYS"
+        },
+        "prompts": [
+            {
+                "id": "Elicit.Slot.1301132670653.1459658627492",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "which stock do you want to check?"
+                    }
+                ]
+            }
+        ]
     }
 }
