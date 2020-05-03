@@ -34,27 +34,33 @@ const HasStockDataLaunchRequestHandler = {
       const stocks = getCurrentStockList(handlerInput);
 
       const stockNum = stocks.length ;
-      if(stockNum==1){
+      if(stockNum===1){
         const stock = stocks[0];
-        const speakOutput = `Welcome back. Do you like me to check the latest price of ${stock}?`;
+        const speakOutput = `Welcome back.  You currently have ${stock} in your stock list. Do you like me to check the latest price?`;
 
         return handlerInput.responseBuilder
-        .speak(speakOutput)
         .addDelegateDirective({
           name: 'CheckPriceIntent',
           confirmationStatus: 'NONE',
           slots: {
-            stockSymbol: {
+         /*   stockSymbol: {
+              name: 'FB',
               value: stock
-            }
+            }*/
           }
        })
-        .getResponse();
+       .speak(speakOutput) //Note: we have to 'speak' after delegate directive is added.
+       .getResponse();
       }
 
-      const speakOutput = `Welcome back. You have ${stockNum} saved stocks. Do you like me to check the latest price?`;
+      const speakOutput = `Welcome back. You currently have ${stockNum} stocks in your list. Do you like me to check the latest price?`;
 
         return handlerInput.responseBuilder
+            .addDelegateDirective({
+                name: 'CheckPriceIntent',
+                confirmationStatus: 'NONE',
+                slots: {}
+                })
             .speak(speakOutput)
    //         .addElicitSlotDirective('teaType')
             .getResponse();
