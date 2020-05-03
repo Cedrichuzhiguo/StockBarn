@@ -78,11 +78,13 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === `LaunchRequest` ;
   },
   handle(handlerInput) {
-    const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help you manage your investment portofolio. To get it started, you can add a few stock to the list.' 
-    const helpMessage = 'For example, you can say add Amazon to the list';
+    const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help with your investment portofolio. For example, I can help you check the price of a stock. Do you want to do that?' 
+    const helpMessage = 'You can say, what is the price of Amazon';
+
+
     return handlerInput.responseBuilder
-    .addDelegateDirective({
-      name: 'AddStockToListIntent',
+      .addDelegateDirective({
+      name: 'CheckPriceIntent',
       confirmationStatus: 'NONE',
       slots: {}
       })
@@ -146,9 +148,24 @@ const CheckStockPriceHandler = {
         console.log('Do nothing for now. Might want to expand here');
     }
 
-    return response.speak(speakOutput)
-      //             .reprompt(repromptOutput)
-                   .getResponse();
+
+    if(true){
+      response.speak(`Do you also like to add ${stockSymbol} to your list?`);
+      response.addDelegateDirective({
+        name: 'AddStockToListIntent',
+        confirmationStatus: 'NONE',
+        slots: {
+          stockSymbol:{
+            name: 'stockSymbol',
+            value: stockSymbol
+          }
+        }
+        })
+    }else{
+       response.speak(speakOutput);
+    }
+
+    return response.getResponse();
   },
 };
 
@@ -173,6 +190,9 @@ const CheckPortofolioIntentHandler = {
     const stockNum = stocks.length ;
 
     if(stockNum === 0){
+
+      setAttribute(handlerInput, attr_name.REDIRECT_INTENT, 'AddStockToListIntent'); 
+
       return handlerInput.responseBuilder
       .addDelegateDirective({
         name: 'AddStockToListIntent',
@@ -204,7 +224,7 @@ const CheckPortofolioIntentHandler = {
 const YesIntentHandler = {
   canHandle(handlerInput) {
     console.log("Inside RepeatHandler");
-    const redirectIntent = getRedirectIntent(handlerInput);
+    const redirectIntent = getAttribute(handlerInput, attr_name.REDIRECT_INTENT);
     const request = handlerInput.requestEnvelope.request;
 
     return redirectIntent &&
@@ -214,9 +234,9 @@ const YesIntentHandler = {
   handle(handlerInput) {
     console.log("Inside RepeatHandler - handle");
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const redirectIntent = getRedirectIntent(handlerInput);
+    const redirectIntent = getAttribute(handlerInput, attr_name.REDIRECT_INTENT);
 
-    delete attributes.redirectIntent; // reset redirectIntent to empty.
+    setAttribute(handlerInput, attr_name.REDIRECT_INTENT, null); // reset redirectIntent to empty.
 
     return handlerInput.responseBuilder
       .addDelegateDirective({
@@ -224,18 +244,22 @@ const YesIntentHandler = {
         confirmationStatus: 'NONE',
         slots: {}
         })
-        //.speak('Great.')
+        .speak('Great.')
         .getResponse();
   },
 };
 
-function getRedirectIntent(handlerInput){
+function getAttribute(handlerInput, name){
   const attributes = handlerInput.attributesManager.getSessionAttributes();
-  let redirectIntent = attributes.redirectIntent;
-  console.log(`RedirectIntent = ${redirectIntent}`);
-  return redirectIntent;
+  return attributes[name];
 }
-
+function setAttribute(handleInput, name, value){
+  const attributes = handlerInput.attributesManager.getSessionAttributes();
+  attributes[name] = value ;
+  if (!value){
+    delete attributes[name];
+  }
+}
 
 const RepeatHandler = {
   canHandle(handlerInput) {
@@ -338,8 +362,8 @@ const states = {
   QUIZ: `_QUIZ`,
 };
 
-const sessionAttribute = {
-
+const attr_name = {
+    REDIRECT_INTENT: 'REDIRECT_INTENT'
 };
 
 
