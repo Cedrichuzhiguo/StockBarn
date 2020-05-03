@@ -31,13 +31,32 @@ const HasStockDataLaunchRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest' && (stocks.length>0);
     },
     handle(handlerInput) {
+      const stocks = getCurrentStockList(handlerInput);
 
-       const stocks = getCurrentStockList(handlerInput);
+      const stockNum = stocks.length ;
+      if(stockNum==1){
+        const stock = stocks[0];
+        const speakOutput = `Welcome back. Do you like me to check the latest price of ${stock}?`;
 
-        const speakOutput = `Welcome back. Do you like me to check the latest price or news of your current stocks?`;
+        return handlerInput.responseBuilder
+        .speak(speakOutput)
+        .addDelegateDirective({
+          name: 'CheckPriceIntent',
+          confirmationStatus: 'NONE',
+          slots: {
+            stockSymbol: {
+              value: stock
+            }
+          }
+       })
+        .getResponse();
+      }
+
+      const speakOutput = `Welcome back. You have ${stockNum} saved stocks. Do you like me to check the latest price?`;
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
+   //         .addElicitSlotDirective('teaType')
             .getResponse();
     }
 };
@@ -83,54 +102,36 @@ const CaputureStockSymbolIntentHandler = {
         }
 }
 
-const QuizHandler = {
+const CheckStockPriceHandler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
-    console.log("Inside QuizHandler");
+    console.log("Inside CheckStockPriceHandler");
     console.log(JSON.stringify(request));
+    const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
+    
+
     return request.type === "IntentRequest" &&
-           (request.intent.name === "QuizIntent" || request.intent.name === "AMAZON.StartOverIntent");
+           (request.intent.name === "CheckPriceIntent" || (request.intent.name === "AMAZON.YesIntent" && (stockSymbol!=null)));
   },
   handle(handlerInput) {
-    console.log("Inside QuizHandler - handle");
+    console.log("Inside CheckStockPriceHandler - handle");
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const response = handlerInput.responseBuilder;
-    attributes.state = states.QUIZ;
-    attributes.counter = 0;
-    attributes.quizScore = 0;
+    const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
 
-    var question = askQuestion(handlerInput);
-    var speakOutput = startQuizMessage + question;
-    var repromptOutput = question;
+    const price = 1.0 ;
 
-    const item = attributes.quizItem;
-    const property = attributes.quizProperty;
+    var speakOutput = `Current stock price for ${stockSymbol} is: ${price} USD`;
+  //  var repromptOutput = '';
+
+
 
     if (supportsDisplay(handlerInput)) {
-      const title = `Question #${attributes.counter}`;
-      const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getQuestionWithoutOrdinal(property, item)).getTextContent();
-      const backgroundImage = new Alexa.ImageHelper().addImageInstance(getBackgroundImage(attributes.quizItem.Abbreviation)).getImage();
-      const itemList = [];
-      getAndShuffleMultipleChoiceAnswers(attributes.selectedItemIndex, item, property).forEach((x, i) => {
-        itemList.push(
-          {
-            "token" : x,
-            "textContent" : new Alexa.PlainTextContentHelper().withPrimaryText(x).getTextContent(),
-          }
-        );
-      });
-      response.addRenderTemplateDirective({
-        type : 'ListTemplate1',
-        token : 'Question',
-        backButton : 'hidden',
-        backgroundImage,
-        title,
-        listItems : itemList,
-      });
+        console.log('Do nothing for now. Might want to expand here');
     }
 
     return response.speak(speakOutput)
-                   .reprompt(repromptOutput)
+      //             .reprompt(repromptOutput)
                    .getResponse();
   },
 };
@@ -417,6 +418,11 @@ const states = {
   QUIZ: `_QUIZ`,
 };
 
+const sessionAttribute = {
+
+};
+
+
 const welcomeMessage = `Welcome to the United States Quiz Game!  You can ask me about any of the fifty states and their capitals, or you can ask me to start a quiz.  What would you like to do?`;
 const startQuizMessage = `OK.  I will ask you 10 questions about the United States. `;
 const exitSkillMessage = `Thank you for playing the United States Quiz Game!  Let's play again soon!`;
@@ -535,6 +541,12 @@ function askQuestion(handlerInput) {
   const question = getQuestion(attributes.counter, property, item);
   return question;
 }
+//Check whether session attribute 'attributeName' has a value 'value'.
+function isAttributeEqualsToValue(handlerInput, attributeName, value){
+  const attributes = handlerInput.attributesManager.getSessionAttributes();
+  const currentValue = attributes[attributeName] || null ;
+  return value == currentValue ;
+}
 
 function compareSlots(slots, value) {
   for (const slot in slots) {
@@ -649,7 +661,7 @@ new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTEN
     HasStockDataLaunchRequestHandler,
     LaunchRequestHandler,
     CaputureStockSymbolIntentHandler,
-    QuizHandler,
+    CheckStockPriceHandler,
     DefinitionHandler,
     QuizAnswerHandler,
     RepeatHandler,
