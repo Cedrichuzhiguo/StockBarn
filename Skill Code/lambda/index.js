@@ -43,10 +43,11 @@ const HasStockDataLaunchRequestHandler = {
           name: 'CheckPriceIntent',
           confirmationStatus: 'NONE',
           slots: {
-         /*   stockSymbol: {
-              name: 'FB',
-              value: stock
-            }*/
+            stockSymbol: {
+                name: 'stockSymbol',
+                value: stock
+                
+            }
           }
        })
        .speak(speakOutput) //Note: we have to 'speak' after delegate directive is added.
