@@ -8,6 +8,7 @@
 
 const Alexa = require('ask-sdk-core');
 const persistenceAdapter = require('ask-sdk-s3-persistence-adapter');
+const https = require('https');
 
 const LoadStockDataInterceptor = {
     async process(handlerInput) {
@@ -41,7 +42,8 @@ const HasStockDataLaunchRequestHandler = {
         return handlerInput.responseBuilder
         .addDelegateDirective({
           name: 'CheckPriceIntent',
-          confirmationStatus: 'NONE',
+        //  confirmationStatus: 'NONE',
+           confirmationRequired: false,
           slots: {
             stockSymbol: {
                 name: 'stockSymbol',
@@ -118,21 +120,24 @@ const CheckStockPriceHandler = {
     
 
     return request.type === "IntentRequest" &&
-           (request.intent.name === "CheckPriceIntent" || (request.intent.name === "AMAZON.YesIntent" && (stockSymbol!=null)));
+           (request.intent.name === "CheckPriceIntent" || (request.intent.name === "AMAZON.YesIntent" && stockSymbol));
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
     console.log("Inside CheckStockPriceHandler - handle");
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const response = handlerInput.responseBuilder;
     const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
 
-    const price = 1.0 ;
 
-    var speakOutput = `Current stock price for ${stockSymbol} is: ${price} USD`;
+    const priceInfo = await getStockPrice('AAPL');
+    let price = priceInfo.c || 1.0;
+
+    let speakOutput = `Current stock price for ${stockSymbol} is: ${price} USD`;
   //  var repromptOutput = '';
 
 
 
+    
     if (supportsDisplay(handlerInput)) {
         console.log('Do nothing for now. Might want to expand here');
     }
@@ -553,6 +558,40 @@ function isAttributeEqualsToValue(handlerInput, attributeName, value){
   const attributes = handlerInput.attributesManager.getSessionAttributes();
   const currentValue = attributes[attributeName] || null ;
   return value == currentValue ;
+}
+
+
+//https://finnhub.io/api/v1/quote?symbol=AAPL&token=bqn2eh7rh5re7283jbh0
+ function getStockPrice(symbol) {
+     return new Promise(((resolve, reject) => {
+    var options = {
+        host: 'finnhub.io',
+        path: `/api/v1/quote?symbol=${symbol}&token=bqn2eh7rh5re7283jbh0`,
+        method: 'GET',
+    };
+
+    
+    var req = https.request(options, res => {
+        res.setEncoding('utf8');
+        let responseString = "";
+        
+        //accept incoming data asynchronously
+        res.on('data', chunk => {
+            responseString = responseString + chunk;
+        });
+        
+        //return the data when streaming is complete
+        res.on('end', () => {
+            console.log(responseString);
+            resolve(JSON.parse(responseString));
+        });
+        
+      res.on('error', (error) => {
+        reject(error);
+      });
+    });
+    req.end();
+     }));
 }
 
 function compareSlots(slots, value) {
