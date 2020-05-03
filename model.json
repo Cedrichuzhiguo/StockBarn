@@ -78,6 +78,18 @@
                         "check {stockSymbol} please",
                         "check price of {stockSymbol}"
                     ]
+                },
+                {
+                    "name": "CheckPortofolioIntent",
+                    "slots": [],
+                    "samples": [
+                        "check stock prices",
+                        "check portofolio",
+                        "How is my baby",
+                        "How are my stocks going",
+                        "How is my stocks going",
+                        "check my portofolio performance"
+                    ]
                 }
             ],
             "types": [
@@ -89,14 +101,19 @@
                             "name": {
                                 "value": "Facebook",
                                 "synonyms": [
-                                    "facebook"
+                                    "F-B",
+                                    "FB"
                                 ]
                             }
                         },
                         {
                             "id": "MSF",
                             "name": {
-                                "value": "Microsoft"
+                                "value": "Microsoft",
+                                "synonyms": [
+                                    "MSF",
+                                    "M-S-F"
+                                ]
                             }
                         },
                         {
@@ -104,20 +121,29 @@
                             "name": {
                                 "value": "Amazon",
                                 "synonyms": [
-                                    "amazon"
+                                    "A-M-Z-N",
+                                    "AMZN"
                                 ]
                             }
                         },
                         {
                             "id": "TSLA",
                             "name": {
-                                "value": "Tesla"
+                                "value": "Tesla",
+                                "synonyms": [
+                                    "T-L-S-A",
+                                    "TLSA"
+                                ]
                             }
                         },
                         {
                             "id": "APPL",
                             "name": {
-                                "value": "Apple"
+                                "value": "Apple",
+                                "synonyms": [
+                                    "A-P-P-L",
+                                    "APPL"
+                                ]
                             }
                         }
                     ]
