@@ -15,7 +15,7 @@ const LoadStockDataInterceptor = {
         const attributesManager = handlerInput.attributesManager;
         const sessionAttributes = await attributesManager.getPersistentAttributes() || {};
 
-        const stocks = sessionAttributes.hasOwnProperty('stocks') ? sessionAttributes.stocks : [];
+      //  const stocks = sessionAttributes.hasOwnProperty('stocks') ? sessionAttributes.stocks : [];
 
 
         attributesManager.setSessionAttributes(sessionAttributes);
@@ -23,16 +23,18 @@ const LoadStockDataInterceptor = {
     }
 };
 
+
+
 /* INTENT HANDLERS */
 const HasStockDataLaunchRequestHandler = {
     canHandle(handlerInput) {
 
-        const stocks = getCurrentStockList(handlerInput);
+        const stocks = getPersistedStockList(handlerInput);
 
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest' && (stocks.length>0);
     },
     handle(handlerInput) {
-      const stocks = getCurrentStockList(handlerInput);
+      const stocks = getPersistedStockList(handlerInput);
 
       const stockNum = stocks.length ;
       if(stockNum===1){
@@ -98,12 +100,7 @@ const AddStockToListIntentHandler = {
     async handle(handlerInput){
         const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
         
-        const attributesManager = handlerInput.attributesManager;
-        const stockAttributes = {
-            "stocks": [stockSymbol]
-            }
-        attributesManager.setPersistentAttributes(stockAttributes);
-        await attributesManager.savePersistentAttributes();
+       saveToPersistStockList(handlerInput, stockSymbol);
         
    //     const speakOutput = `Got it, ${stockSymbol}!`;
         const speakOutput = 'Would you like to add another one?'
@@ -404,12 +401,24 @@ const useCardsFlag = true;
 
 /* HELPER FUNCTIONS */
 
-function getCurrentStockList(handlerInput){
-        const attributesManager = handlerInput.attributesManager;
-        const sessionAttributes = attributesManager.getSessionAttributes() || {};
+async function getPersistedStockList(handlerInput){
+  const attributesManager = handlerInput.attributesManager;
+  const persistedAttributes = await attributesManager.getPersistentAttributes() || {};
 
-        const stocks = sessionAttributes.hasOwnProperty('stocks') ? sessionAttributes.stocks : [];
-        return stocks;
+  const stocks =  persistedAttributes.stocks || [];
+  return stocks;
+}
+
+async function saveToPersistStockList(handlerInput, stockSymbol){
+  const attributesManager = handlerInput.attributesManager;
+  let persistedAttributes = await attributesManager.getPersistentAttributes() || {};
+
+  const stocks = persistedAttributes.stocks || [];
+  stocks.push(stockSymbol);
+  persistedAttributes.stocks = stocks ;
+
+  attributesManager.setPersistentAttributes(persistedAttributes);
+  await attributesManager.savePersistentAttributes();
 }
 
 // returns true if the skill is running on a device with a display (show|spot)
