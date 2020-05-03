@@ -48,7 +48,6 @@ const HasStockDataLaunchRequestHandler = {
             stockSymbol: {
                 name: 'stockSymbol',
                 value: stock
-                
             }
           }
        })
@@ -65,7 +64,6 @@ const HasStockDataLaunchRequestHandler = {
                 slots: {}
                 })
             .speak(speakOutput)
-   //         .addElicitSlotDirective('teaType')
             .getResponse();
     }
 };
@@ -76,21 +74,26 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === `LaunchRequest` ;
   },
   handle(handlerInput) {
-    const welcomeMessage = 'Hello! Welcome to Stock Barn! I help you manage your stocks. To get it started, you can tell me which stock are you interested in?' 
+    const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help you manage your stock portofolio. To get it started, you can tell me which stock are you interested in?' 
     const helpMessage = 'For example, you can say TESLA, or T-S-L-A!'
     return handlerInput.responseBuilder
+    .addDelegateDirective({
+      name: 'AddStockToListIntent',
+      confirmationStatus: 'NONE',
+      slots: {}
+      })
       .speak(welcomeMessage)
       .reprompt(helpMessage)
       .getResponse();
   },
 };
 
-const CaputureStockSymbolIntentHandler = {
+const AddStockToListIntentHandler = {
    
     async canHandle(handlerInput){
        console.log("envelope:", handlerInput.requestEnvelope);
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'CaptureStockSymbol';
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AddStockToListIntent';
     },
     async handle(handlerInput){
         const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
@@ -102,11 +105,16 @@ const CaputureStockSymbolIntentHandler = {
         attributesManager.setPersistentAttributes(stockAttributes);
         await attributesManager.savePersistentAttributes();
         
-        const speakOutput = `Got it, ${stockSymbol}!`;
-        const helpMessage = 'Would you like to add another one?'
+   //     const speakOutput = `Got it, ${stockSymbol}!`;
+        const speakOutput = 'Would you like to add another one?'
         return handlerInput.responseBuilder
           .speak(speakOutput)
-          .reprompt(helpMessage)
+      //    .reprompt(helpMessage)
+          .addDelegateDirective({
+              name: 'AddStockToListIntent',
+              confirmationStatus: 'NONE',
+              slots: {}
+              })
           .getResponse();
         }
 }
@@ -658,7 +666,7 @@ new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTEN
   .addRequestHandlers(
     HasStockDataLaunchRequestHandler,
     LaunchRequestHandler,
-    CaputureStockSymbolIntentHandler,
+    AddStockToListIntentHandler,
     CheckStockPriceHandler,
     DefinitionHandler,
     QuizAnswerHandler,
