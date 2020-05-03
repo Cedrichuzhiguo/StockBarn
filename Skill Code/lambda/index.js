@@ -41,13 +41,13 @@ const HasStockDataLaunchRequestHandler = {
 
       if(stockNum===1){
         const stock = stocks[0];
-        const speakOutput = `Welcome back.  You currently have ${stock} in your stock list. Do you like me to check the latest price?`;
+        const speakOutput = `Welcome back.  You currently have ${stock} in your stock list. Let me check the latest price for you.`;
 
         return handlerInput.responseBuilder
         .addDelegateDirective({
           name: 'CheckPriceIntent',
-        //  confirmationStatus: 'NONE',
-           confirmationRequired: false,
+          confirmationStatus: 'CONFIRMED',
+          // confirmationRequired: false,
           slots: {
             stockSymbol: {
                 name: 'stockSymbol',
@@ -78,8 +78,8 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === `LaunchRequest` ;
   },
   handle(handlerInput) {
-    const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help you manage your investment portofolio. To get it started, you can tell me which stock are you interested in?' 
-    const helpMessage = 'For example, you can say TESLA, or T-S-L-A!'
+    const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help you manage your investment portofolio. To get it started, you can add a few stock to the list.' 
+    const helpMessage = 'For example, you can say add Amazon to the list';
     return handlerInput.responseBuilder
     .addDelegateDirective({
       name: 'AddStockToListIntent',
@@ -106,15 +106,15 @@ const AddStockToListIntentHandler = {
       const stocks = await saveToPersistStockList(handlerInput, stockSymbol);
         
    //     const speakOutput = `Got it, ${stockSymbol}!`;
-        const speakOutput = `Now, you have ${stocks.length} in your list in total. Would you like to add another one?`
+        const speakOutput = `${stockSymbol} is added. Now, you have ${stocks.length} in your list in total. `
         return handlerInput.responseBuilder
           .speak(speakOutput)
       //    .reprompt(helpMessage)
-          .addDelegateDirective({
+       /*   .addDelegateDirective({
               name: 'AddStockToListIntent',
               confirmationStatus: 'NONE',
               slots: {}
-              })
+              })*/
           .getResponse();
         }
 }
@@ -393,9 +393,9 @@ const sessionAttribute = {
 
 const welcomeMessage = `Welcome to the United States Quiz Game!  You can ask me about any of the fifty states and their capitals, or you can ask me to start a quiz.  What would you like to do?`;
 const startQuizMessage = `OK.  I will ask you 10 questions about the United States. `;
-const exitSkillMessage = `Thank you for playing the United States Quiz Game!  Let's play again soon!`;
+const exitSkillMessage = `Thank you for using stock ninja! You'll make a lot money soon!`;
 const repromptSpeech = `Which other state or capital would you like to know about?`;
-const helpMessage = `I know lots of things about the United States.  You can ask me about a state or a capital, and I'll tell you what I know.  You can also test your knowledge by asking me to start a quiz.  What would you like to do?`;
+const helpMessage = `I am stock ninja, help you manage your portofolio. For example, you can ask, check price of amazon.`;
 const useCardsFlag = true;
 
 /* HELPER FUNCTIONS */
