@@ -97,9 +97,19 @@
                     "name": "STOCK_SYMBOL",
                     "values": [
                         {
+                            "id": "GOOG",
+                            "name": {
+                                "value": "google",
+                                "synonyms": [
+                                    "G-O-O-G",
+                                    "GOOG"
+                                ]
+                            }
+                        },
+                        {
                             "id": "FB",
                             "name": {
-                                "value": "Facebook",
+                                "value": "facebook",
                                 "synonyms": [
                                     "F-B",
                                     "FB"
@@ -109,7 +119,7 @@
                         {
                             "id": "MSF",
                             "name": {
-                                "value": "Microsoft",
+                                "value": "microsoft",
                                 "synonyms": [
                                     "MSF",
                                     "M-S-F"
@@ -119,7 +129,7 @@
                         {
                             "id": "AMZN",
                             "name": {
-                                "value": "Amazon",
+                                "value": "amazon",
                                 "synonyms": [
                                     "A-M-Z-N",
                                     "AMZN"
@@ -129,7 +139,7 @@
                         {
                             "id": "TSLA",
                             "name": {
-                                "value": "Tesla",
+                                "value": "tesla",
                                 "synonyms": [
                                     "T-L-S-A",
                                     "TLSA"
@@ -139,7 +149,7 @@
                         {
                             "id": "APPL",
                             "name": {
-                                "value": "Apple",
+                                "value": "apple",
                                 "synonyms": [
                                     "A-P-P-L",
                                     "APPL"
