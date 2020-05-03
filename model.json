@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "crazy robot",
+            "invocationName": "stock ninja",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -42,6 +42,25 @@
                         "I like {stockSymbol}",
                         "I want to buy {stockSymbol}",
                         "I'm interested in {stockSymbol}"
+                    ]
+                },
+                {
+                    "name": "AMAZON.YesIntent",
+                    "samples": []
+                },
+                {
+                    "name": "CheckPriceIntent",
+                    "slots": [
+                        {
+                            "name": "stockSymbol",
+                            "type": "STOCK_SYMBOL"
+                        }
+                    ],
+                    "samples": [
+                        "how much is {stockSymbol} ",
+                        "please check {stockSymbol}",
+                        "check {stockSymbol} please",
+                        "check price of {stockSymbol}"
                     ]
                 }
             ],
