@@ -142,7 +142,7 @@ const CheckStockPriceHandler = {
     const priceInfo = await getStockPrice(stockSymbol);
     let price = priceInfo.c || 1.0;
 
-    let speakOutput = `Current stock price for ${stockSymbol} is: ${price} USD`;
+    let speakOutput = `Current stock price for ${stockSymbol} is: ${price} USD. \n`;
 
     if (supportsDisplay(handlerInput)) {
         console.log('Do nothing for now. Might want to expand here');
@@ -150,17 +150,19 @@ const CheckStockPriceHandler = {
 
 
     if(true){
-      response.speak(`Do you also like to add ${stockSymbol} to your list?`);
-      response.addDelegateDirective({
-        name: 'AddStockToListIntent',
-        confirmationStatus: 'NONE',
-        slots: {
-          stockSymbol:{
-            name: 'stockSymbol',
-            value: stockSymbol
-          }
-        }
-        })
+      setAttribute(handlerInput, attr_name.REDIRECT_INTENT, 'AddStockToListIntent'); 
+      speakOutput += `Do you also like to add ${stockSymbol} to your list?`;
+      response.speak(speakOutput);
+      // response.addDelegateDirective({
+      //   name: 'AddStockToListIntent',
+      //   confirmationStatus: 'NONE',
+      //   slots: {
+      //     stockSymbol:{
+      //       name: 'stockSymbol',
+      //       value: stockSymbol
+      //     }
+      //   }
+      //   })
     }else{
        response.speak(speakOutput);
     }
@@ -205,6 +207,7 @@ const CheckPortofolioIntentHandler = {
 
     let speakOutput = `You currently have ${stockNum} in your portofolio. Here is the current prices:`;
 
+    let stock;
     for (stock of stocks){
       const priceInfo = await getStockPrice(stock);
       let price = priceInfo.c || 0.0;
@@ -223,7 +226,7 @@ const CheckPortofolioIntentHandler = {
 
 const YesIntentHandler = {
   canHandle(handlerInput) {
-    console.log("Inside RepeatHandler");
+    console.log("Inside YesIntentHandler");
     const redirectIntent = getAttribute(handlerInput, attr_name.REDIRECT_INTENT);
     const request = handlerInput.requestEnvelope.request;
 
@@ -232,7 +235,7 @@ const YesIntentHandler = {
            request.intent.name === 'AMAZON.YesIntent';
   },
   handle(handlerInput) {
-    console.log("Inside RepeatHandler - handle");
+    console.log("Inside YesIntentHandler - handle");
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const redirectIntent = getAttribute(handlerInput, attr_name.REDIRECT_INTENT);
 
@@ -253,7 +256,7 @@ function getAttribute(handlerInput, name){
   const attributes = handlerInput.attributesManager.getSessionAttributes();
   return attributes[name];
 }
-function setAttribute(handleInput, name, value){
+function setAttribute(handlerInput, name, value){
   const attributes = handlerInput.attributesManager.getSessionAttributes();
   attributes[name] = value ;
   if (!value){
@@ -528,10 +531,15 @@ function getStockTickerSymbol(stockName){
       console.log(`Can not find the symbol for ${stockName}`);
       return null;
     }
+    
+    let path = `/api/v1/quote?symbol=${symbol}&token=bqn2eh7rh5re7283jbh0`;
+    
+    console.log(`Request stock price with ${path}`);
+    
     return new Promise(((resolve, reject) => {
     var options = {
         host: 'finnhub.io',
-        path: `/api/v1/quote?symbol=${symbol}&token=bqn2eh7rh5re7283jbh0`,
+        path: path,
         method: 'GET',
     };
 
