@@ -201,6 +201,40 @@ const CheckPortofolioIntentHandler = {
   },
 };
 
+const YesIntentHandler = {
+  canHandle(handlerInput) {
+    console.log("Inside RepeatHandler");
+    const redirectIntent = getRedirectIntent(handlerInput);
+    const request = handlerInput.requestEnvelope.request;
+
+    return redirectIntent &&
+           request.type === 'IntentRequest' &&
+           request.intent.name === 'AMAZON.YesIntent';
+  },
+  handle(handlerInput) {
+    console.log("Inside RepeatHandler - handle");
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const redirectIntent = getRedirectIntent(handlerInput);
+
+    delete attributes.redirectIntent; // reset redirectIntent to empty.
+
+    return handlerInput.responseBuilder
+      .addDelegateDirective({
+        name: redirectIntent,
+        confirmationStatus: 'NONE',
+        slots: {}
+        })
+        //.speak('Great.')
+        .getResponse();
+  },
+};
+
+function getRedirectIntent(handlerInput){
+  const attributes = handlerInput.attributesManager.getSessionAttributes();
+  let redirectIntent = attributes.redirectIntent;
+  console.log(`RedirectIntent = ${redirectIntent}`);
+  return redirectIntent;
+}
 
 
 const RepeatHandler = {
@@ -531,6 +565,7 @@ new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTEN
     AddStockToListIntentHandler,
     CheckStockPriceHandler,
     CheckPortofolioIntentHandler,
+    YesIntentHandler,
     RepeatHandler,
     HelpHandler,
     ExitHandler,
