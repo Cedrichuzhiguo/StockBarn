@@ -283,7 +283,8 @@ function getAttribute(handlerInput, name){
   let value = attributes[name] || null;
   console.log(`Found attribute ${name}:${value}`);
   return value;
-}
+};
+
 function setAttribute(handlerInput, name, value){
   const attributes = handlerInput.attributesManager.getSessionAttributes() || {};
   attributes[name] = value ;
@@ -291,35 +292,14 @@ function setAttribute(handlerInput, name, value){
     delete attributes[name];
   }
   handlerInput.attributesManager.setSessionAttributes(attributes);
-}
+};
 
 function getSlotValue(handlerInput, slotName){
   let slots = handlerInput.requestEnvelope.request.intent.slots || {};
   let slotOfName = slots[slotName] || {} ;
   return slotOfName.value || null;
-}
-
-const RepeatHandler = {
-  canHandle(handlerInput) {
-    console.log("Inside RepeatHandler");
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const request = handlerInput.requestEnvelope.request;
-
-    return attributes.state === states.QUIZ &&
-           request.type === 'IntentRequest' &&
-           request.intent.name === 'AMAZON.RepeatHandler';
-  },
-  handle(handlerInput) {
-    console.log("Inside RepeatHandler - handle");
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const question = getQuestion(attributes.counter, attributes.quizproperty, attributes.quizitem);
-
-    return handlerInput.responseBuilder
-      .speak(question)
-      .reprompt(question)
-      .getResponse();
-  },
 };
+
 
 const HelpHandler = {
   canHandle(handlerInput) {
@@ -531,7 +511,6 @@ new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTEN
     CheckStockPriceHandler,
     CheckPortofolioIntentHandler,
     ConfirmationIntentHandler,
-    RepeatHandler,
     HelpHandler,
     ExitHandler,
     SessionEndedRequestHandler
