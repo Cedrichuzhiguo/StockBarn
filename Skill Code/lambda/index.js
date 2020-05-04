@@ -249,29 +249,6 @@ const ConfirmationIntentHandler = {
   },
 };
 
-function getAttribute(handlerInput, name){
-  const attributes = handlerInput.attributesManager.getSessionAttributes() || {};
-  console.log('Current attribute:', attributes);
-  let value = attributes[name] || null;
-  console.log(`Found attribute ${name}:${value}`);
-  return value;
-};
-
-function setAttribute(handlerInput, name, value){
-  const attributes = handlerInput.attributesManager.getSessionAttributes() || {};
-  attributes[name] = value ;
-  if (!value){
-    delete attributes[name];
-  }
-  handlerInput.attributesManager.setSessionAttributes(attributes);
-};
-
-function getSlotValue(handlerInput, slotName){
-  let slots = handlerInput.requestEnvelope.request.intent.slots || {};
-  let slotOfName = slots[slotName] || {} ;
-  return slotOfName.value || null;
-};
-
 
 const HelpHandler = {
   canHandle(handlerInput) {
@@ -353,6 +330,32 @@ const helpMessage = `I am stock ninja, help you manage your portofolio. For exam
 
 
 /* HELPER FUNCTIONS */
+
+
+function getAttribute(handlerInput, name){
+  const attributes = handlerInput.attributesManager.getSessionAttributes() || {};
+  console.log('Current attribute:', attributes);
+  let value = attributes[name] || null;
+  console.log(`Found attribute ${name}:${value}`);
+  return value;
+};
+
+function setAttribute(handlerInput, name, value){
+  const attributes = handlerInput.attributesManager.getSessionAttributes() || {};
+  attributes[name] = value ;
+  if (!value){
+    delete attributes[name];
+  }
+  handlerInput.attributesManager.setSessionAttributes(attributes);
+};
+
+function getSlotValue(handlerInput, slotName){
+  let slots = handlerInput.requestEnvelope.request.intent.slots || {};
+  let slotOfName = slots[slotName] || {} ;
+  return slotOfName.value || null;
+};
+
+
 
 async function getPersistedStockList(handlerInput){
   const attributesManager = handlerInput.attributesManager;
