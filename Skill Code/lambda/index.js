@@ -26,46 +26,37 @@ const LoadStockDataInterceptor = {
 
 
 
-/* INTENT HANDLERS */
-const HasStockDataLaunchRequestHandler = {
-    async canHandle(handlerInput) {
-
-        const stocks = await getPersistedStockList(handlerInput);
-
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest' && (stocks.length>0);
-    },
-    async handle(handlerInput) {
-      const stocks = await getPersistedStockList(handlerInput);
-
-      let stockOutput = await speakPortfolioWithSSML(stocks, handlerInput); 
-      //We potentially should consider the progressive responsive if there are too many stocks in the list.
-      
-      //Simple SSML
-      const speakOutput = `<amazon:emotion name="excited" intensity="medium">  Welcome back Stock Ninja. Now checking your portofolio:<break time="1s"/> ${stockOutput}  </amazon:emotion> ` ;
-
-      return handlerInput.responseBuilder.speak(speakOutput).getResponse();
-    }
-};
-
-
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === `LaunchRequest` ;
   },
-  handle(handlerInput) {
-    const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help with your investment portofolio. For example, I can help you check the price of a stock. Do you want to do that?' 
-    const helpMessage = 'You can say, what is the price of Amazon';
+  async handle(handlerInput) {
+    const stocks = await getPersistedStockList(handlerInput);
+    
+    if(stocks.length===0){  
+        const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help with your investment portofolio. For example, I can help you check the price of a stock. You can say, check the price of Amazon.' 
+        const helpMessage = 'You can say, what is the price of Facebook';
+    
+    
+        return handlerInput.responseBuilder
+          .addDelegateDirective({
+          name: 'CheckPriceIntent',
+          confirmationStatus: 'NONE',
+          slots: {}
+          })
+          .speak(welcomeMessage)
+          .reprompt(helpMessage)
+          .getResponse();
+    }
+    let stockOutput = await speakPortfolioWithSSML(stocks, handlerInput); 
 
+    
+    //  //Simple SSML
+    let speakOutput = `<amazon:emotion name="excited" intensity="medium">  Welcome back Stock Ninja. Now checking your portofolio:<break time="1s"/> ${stockOutput}  </amazon:emotion> ` ;
 
-    return handlerInput.responseBuilder
-      .addDelegateDirective({
-      name: 'CheckPriceIntent',
-      confirmationStatus: 'NONE',
-      slots: {}
-      })
-      .speak(welcomeMessage)
-      .reprompt(helpMessage)
-      .getResponse();
+    
+    return handlerInput.responseBuilder.speak(speakOutput).reprompt(suggestAccountLink).getResponse();
+    
   },
 };
 
@@ -517,7 +508,7 @@ exports.handler = skillBuilder.withPersistenceAdapter(
 new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTENCE_BUCKET})
 )
   .addRequestHandlers(
-    HasStockDataLaunchRequestHandler,
+   // HasStockDataLaunchRequestHandler,
     LaunchRequestHandler,
     AddStockToListIntentHandler,
     CheckStockPriceHandler,
