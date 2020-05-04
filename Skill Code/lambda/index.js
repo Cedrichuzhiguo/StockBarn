@@ -37,38 +37,12 @@ const HasStockDataLaunchRequestHandler = {
     async handle(handlerInput) {
       const stocks = await getPersistedStockList(handlerInput);
 
-      const stockNum = stocks.length ;
+      let stockOutput = await speakPortofolio(stocks, handlerInput); 
+      //We potentially should consider the progressive responsive if there are too many stocks in the list.
 
-      if(stockNum===1){
-        const stock = stocks[0];
-        const speakOutput = `Welcome back.  You currently have ${stock} in your stock list. Let me check the latest price for you.`;
+      const speakOutput = `Welcome back. Stock Ninja. Let` + stockOutput;
 
-        return handlerInput.responseBuilder
-        .addDelegateDirective({
-          name: 'CheckPriceIntent',
-          confirmationStatus: 'CONFIRMED',
-          // confirmationRequired: false,
-          slots: {
-            stockSymbol: {
-                name: 'stockSymbol',
-                value: stock
-            }
-          }
-       })
-       .speak(speakOutput) //Note: we have to 'speak' after delegate directive is added.
-       .getResponse();
-      }
-
-      const speakOutput = `Welcome back. You currently have ${stockNum} stocks in your list. Do you like me to check the latest price?`;
-
-        return handlerInput.responseBuilder
-            .addDelegateDirective({
-                name: 'CheckPriceIntent',
-                confirmationStatus: 'NONE',
-                slots: {}
-                })
-            .speak(speakOutput)
-            .getResponse();
+      return handlerInput.responseBuilder.speak(speakOutput).getResponse();
     }
 };
 
@@ -208,24 +182,28 @@ const CheckPortofolioIntentHandler = {
         .getResponse();
     }
 
-    let speakOutput = `You currently have ${stockNum} stocks in your portofolio. Here is the current prices:`;
-
-    let stock;
-    for (stock of stocks){
-      const priceInfo = await getStockPrice(stock);
-      let price = priceInfo.c || 0.0;
-      speakOutput += `${stock}: ${price} USD; `;
-    }
-    if (supportsDisplay(handlerInput)) {
-        console.log('Do nothing for now. Might want to expand here');
-    }
-
+    let speakOutput = await speakPortofolio(stocks, handlerInput);
 
     return response.speak(speakOutput)
                    .reprompt(suggestAccountLink)
                    .getResponse();
   },
 };
+
+async function speakPortofolio(stocks, handlerInput){
+  let speakOutput = `You currently have ${stocks.length} stocks in your portofolio. Here is the current prices:`;
+
+  let stock;
+  for (stock of stocks){
+    const priceInfo = await getStockPrice(stock);
+    let price = priceInfo.c || 0.0;
+    speakOutput += `${stock}: ${price} USD; `;
+  }
+  if (supportsDisplay(handlerInput)) {
+      console.log('Do nothing for now. Might want to expand here');
+  }
+  return speakOutput;
+}
 
 const ConfirmationIntentHandler = {
   canHandle(handlerInput) {
