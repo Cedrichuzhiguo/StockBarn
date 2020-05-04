@@ -148,7 +148,8 @@ const CheckStockPriceHandler = {
         console.log('Do nothing for now. Might want to expand here');
     }
 
-    let counter = saveStockQueryCounter(handlerInput, stockSymbol);
+    let counter = await saveStockQueryCounter(handlerInput, stockSymbol);
+    console.log('Counter:', counter);
 
     if(counter.shouldStore){
       setAttribute(handlerInput, attr_name.REDIRECT_INTENT, 'AddStockToListIntent'); 
@@ -414,7 +415,7 @@ async function saveStockQueryCounter(handlerInput, stockSymbol){
   console.log('Current persisted Attributes:', persistedAttributes);
 
   let stocks = persistedAttributes.stocks || [];
-  let counters = persistedAttributes.queryCounters || [];
+  let counters = persistedAttributes.queryCounters || {};
 
   let count = counters[stockSymbol] || 0 ;
   count = count + 1;
