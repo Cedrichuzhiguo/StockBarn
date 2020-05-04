@@ -41,7 +41,7 @@ const HasStockDataLaunchRequestHandler = {
       //We potentially should consider the progressive responsive if there are too many stocks in the list.
       
       //Simple SSML
-      const speakOutput = `Welcome back Stock Ninja.  <amazon:emotion name="excited" intensity="medium"> Now checking your portofolio:<break time="2s"/> ${stockOutput}  </amazon:emotion> ` ;
+      const speakOutput = `<amazon:emotion name="excited" intensity="medium">  Welcome back Stock Ninja. Now checking your portofolio:<break time="2s"/> ${stockOutput}  </amazon:emotion> ` ;
 
       return handlerInput.responseBuilder.speak(speakOutput).getResponse();
     }
@@ -192,7 +192,7 @@ const CheckPortofolioIntentHandler = {
 };
 
 async function speakPortofolioWithSSML(stocks, handlerInput){
-  let speakOutput = `You currently have ${stocks.length} stocks in your portofolio. Here is the current prices: <break time="1s"/>`;
+  let speakOutput = `You currently have ${stocks.length} stocks in your list. Here is the current prices: <break time="2s"/>`;
 
   let stock;
   for (stock of stocks){
