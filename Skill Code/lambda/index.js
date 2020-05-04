@@ -18,8 +18,8 @@ const LoadStockDataInterceptor = {
         const stocks = persistedAttributes.stocks || [];
         console.log(`Current stocks: ${stocks}`);
 
-
-        attributesManager.setSessionAttributes(persistedAttributes);
+        setAttribute(handlerInput, 'stocks', stocks);
+        
 
     }
 };
@@ -237,7 +237,7 @@ const YesIntentHandler = {
   },
   handle(handlerInput) {
     console.log("Inside YesIntentHandler - handle");
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
     const redirectIntent = getAttribute(handlerInput, attr_name.REDIRECT_INTENT);
 
     const stockSymbol = getAttribute(handlerInput, attr_name.STOCK_SYMBOL);
@@ -269,15 +269,19 @@ const YesIntentHandler = {
 };
 
 function getAttribute(handlerInput, name){
-  const attributes = handlerInput.attributesManager.getSessionAttributes();
-  return attributes[name];
+  const attributes = handlerInput.attributesManager.getSessionAttributes() || {};
+  console.log('Current attribute:', attributes);
+  let value = attributes[name] || null;
+  console.log(`Found attribute ${name}:${value}`);
+  return value;
 }
 function setAttribute(handlerInput, name, value){
-  const attributes = handlerInput.attributesManager.getSessionAttributes();
+  const attributes = handlerInput.attributesManager.getSessionAttributes() || {};
   attributes[name] = value ;
   if (!value){
     delete attributes[name];
   }
+  handlerInput.attributesManager.setSessionAttributes(attributes);
 }
 
 function getSlotValue(handlerInput, slotName){
@@ -536,7 +540,7 @@ function isAttributeEqualsToValue(handlerInput, attributeName, value){
 const stock_to_tickers = {
   facebook: 'FB',
   amazon: 'AMZN',
-  apple: 'APPL',
+  apple: 'AAPL',
   netflix:'NFLX',
   google: 'GOOG',
   tesla: 'TSLA'
