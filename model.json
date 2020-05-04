@@ -80,11 +80,13 @@
                     ]
                 },
                 {
-                    "name": "CheckPortofolioIntent",
+                    "name": "CheckPortfolioIntent",
                     "slots": [],
                     "samples": [
+                        "check my portfolio",
+                        "check portfolio",
+                        "check prices",
                         "check stock prices",
-                        "check portofolio",
                         "How is my baby",
                         "How are my stocks going",
                         "How is my stocks going",

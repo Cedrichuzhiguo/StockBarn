@@ -37,11 +37,11 @@ const HasStockDataLaunchRequestHandler = {
     async handle(handlerInput) {
       const stocks = await getPersistedStockList(handlerInput);
 
-      let stockOutput = await speakPortofolioWithSSML(stocks, handlerInput); 
+      let stockOutput = await speakPortfolioWithSSML(stocks, handlerInput); 
       //We potentially should consider the progressive responsive if there are too many stocks in the list.
       
       //Simple SSML
-      const speakOutput = `<amazon:emotion name="excited" intensity="medium">  Welcome back Stock Ninja. Now checking your portofolio:<break time="2s"/> ${stockOutput}  </amazon:emotion> ` ;
+      const speakOutput = `<amazon:emotion name="excited" intensity="medium">  Welcome back Stock Ninja. Now checking your portofolio:<break time="1s"/> ${stockOutput}  </amazon:emotion> ` ;
 
       return handlerInput.responseBuilder.speak(speakOutput).getResponse();
     }
@@ -150,18 +150,18 @@ const CheckStockPriceHandler = {
 };
 
 
-const CheckPortofolioIntentHandler = {
+const CheckPortfolioIntentHandler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
-    console.log("Inside CheckPortofolioIntentHandler");
+    console.log("Inside CheckPortfolioIntentHandler");
     console.log(JSON.stringify(request));
     
 
     return request.type === "IntentRequest" &&
-           (request.intent.name === "CheckPortofolioIntent");
+           (request.intent.name === "CheckPortfolioIntent");
   },
   async handle(handlerInput) {
-    console.log("Inside CheckPortofolioIntentHandler - handle");
+    console.log("Inside CheckPortfolioIntentHandler - handle");
 
     const response = handlerInput.responseBuilder;
 
@@ -183,7 +183,7 @@ const CheckPortofolioIntentHandler = {
         .getResponse();
     }
 
-    let speakOutput = await speakPortofolioWithSSML(stocks, handlerInput);
+    let speakOutput = await speakPortfolioWithSSML(stocks, handlerInput);
 
     return response.speak(speakOutput)
                    .reprompt(suggestAccountLink)
@@ -191,7 +191,7 @@ const CheckPortofolioIntentHandler = {
   },
 };
 
-async function speakPortofolioWithSSML(stocks, handlerInput){
+async function speakPortfolioWithSSML(stocks, handlerInput){
   let speakOutput = `You currently have ${stocks.length} stocks in your list. Here is the current prices: <break time="2s"/>`;
 
   let stock;
@@ -521,7 +521,7 @@ new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTEN
     LaunchRequestHandler,
     AddStockToListIntentHandler,
     CheckStockPriceHandler,
-    CheckPortofolioIntentHandler,
+    CheckPortfolioIntentHandler,
     ConfirmationIntentHandler,
     HelpHandler,
     ExitHandler,
