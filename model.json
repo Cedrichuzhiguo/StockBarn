@@ -90,6 +90,10 @@
                         "How is my stocks going",
                         "check my portofolio performance"
                     ]
+                },
+                {
+                    "name": "AMAZON.NoIntent",
+                    "samples": []
                 }
             ],
             "types": [

@@ -225,20 +225,30 @@ const CheckPortofolioIntentHandler = {
   },
 };
 
-const YesIntentHandler = {
+const ConfirmationIntentHandler = {
   canHandle(handlerInput) {
     console.log("Inside YesIntentHandler");
-    const redirectIntent = getAttribute(handlerInput, attr_name.REDIRECT_INTENT);
+    //const redirectIntent = getAttribute(handlerInput, attr_name.REDIRECT_INTENT);
     const request = handlerInput.requestEnvelope.request;
 
-    return redirectIntent &&
-           request.type === 'IntentRequest' &&
-           request.intent.name === 'AMAZON.YesIntent';
+    return request.type === 'IntentRequest' &&
+           (request.intent.name === 'AMAZON.YesIntent'||request.intent.name === 'AMAZON.NoIntent');
   },
   handle(handlerInput) {
     console.log("Inside YesIntentHandler - handle");
-
+    const request = handlerInput.requestEnvelope.request;
     const redirectIntent = getAttribute(handlerInput, attr_name.REDIRECT_INTENT);
+    let response = handlerInput.responseBuilder;
+    if(request.intent.name === 'AMAZON.NoIntent'){
+      console.log('User said: NO to redirect:', redirectIntent);
+      if (redirectIntent){
+        setAttribute(handlerInput, attr_name.REDIRECT_INTENT, null); // reset redirectIntent to empty.
+        setAttribute(handlerInput, attr_name.STOCK_SYMBOL, null); 
+        return response.speak('OK. Anything else?').getResponse();
+      }else{
+        return response.speak(exitSkillMessage).getResponse();
+      }
+    }
 
     const stockSymbol = getAttribute(handlerInput, attr_name.STOCK_SYMBOL);
 
@@ -252,8 +262,7 @@ const YesIntentHandler = {
     setAttribute(handlerInput, attr_name.REDIRECT_INTENT, null); // reset redirectIntent to empty.
     //setAttribute(handlerInput, attr_name.STOCK_SYMBOL, null); 
 
-    return handlerInput.responseBuilder
-      .addDelegateDirective({
+    return response.addDelegateDirective({
         name: redirectIntent,
         confirmationStatus: 'NONE',
         slots: {
@@ -643,7 +652,7 @@ new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTEN
     AddStockToListIntentHandler,
     CheckStockPriceHandler,
     CheckPortofolioIntentHandler,
-    YesIntentHandler,
+    ConfirmationIntentHandler,
     RepeatHandler,
     HelpHandler,
     ExitHandler,
