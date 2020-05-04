@@ -148,11 +148,12 @@ const CheckStockPriceHandler = {
         console.log('Do nothing for now. Might want to expand here');
     }
 
+    let counter = saveStockQueryCounter(handlerInput, stockSymbol);
 
-    if(true){
+    if(counter.shouldStore){
       setAttribute(handlerInput, attr_name.REDIRECT_INTENT, 'AddStockToListIntent'); 
       setAttribute(handlerInput, attr_name.STOCK_SYMBOL, stockSymbol); 
-      speakOutput += `Do you also like to add ${stockSymbol} to your list?`;
+      speakOutput += `You have checked ${stockSymbol} ${counter.count} times. Do you like to add it to your list?`;
       response.speak(speakOutput);
       // response.addDelegateDirective({
       //   name: 'AddStockToListIntent',
@@ -206,13 +207,13 @@ const CheckPortofolioIntentHandler = {
         .getResponse();
     }
 
-    let speakOutput = `You currently have ${stockNum} in your portofolio. Here is the current prices:`;
+    let speakOutput = `You currently have ${stockNum} stocks in your portofolio. Here is the current prices:`;
 
     let stock;
     for (stock of stocks){
       const priceInfo = await getStockPrice(stock);
       let price = priceInfo.c || 0.0;
-      speakOutput += `${stock.name}: ${price} USD; `;
+      speakOutput += `${stock}: ${price} USD; `;
     }
     if (supportsDisplay(handlerInput)) {
         console.log('Do nothing for now. Might want to expand here');
@@ -405,6 +406,36 @@ async function saveToPersistStockList(handlerInput, stockSymbol){
   return stocks;
 }
 
+
+async function saveStockQueryCounter(handlerInput, stockSymbol){
+  const attributesManager = handlerInput.attributesManager;
+  let persistedAttributes = await attributesManager.getPersistentAttributes() || {};
+
+  console.log('Current persisted Attributes:', persistedAttributes);
+
+  let stocks = persistedAttributes.stocks || [];
+  let counters = persistedAttributes.queryCounters || [];
+
+  let count = counters[stockSymbol] || 0 ;
+  count = count + 1;
+  counters[stockSymbol] = count ;
+  persistedAttributes.queryCounters = counters ;
+  attributesManager.setPersistentAttributes(persistedAttributes);
+  await attributesManager.savePersistentAttributes();
+
+  let result = {count: count};
+
+  if(stocks.includes(stockSymbol)){
+    result.shouldStore = false;
+    return result;
+  }
+  
+  result.shouldStore = (count>2);
+  
+  return result;
+
+}
+
 // returns true if the skill is running on a device with a display (show|spot)
 function supportsDisplay(handlerInput) {
   var hasDisplay =
@@ -436,8 +467,9 @@ const stock_to_tickers = {
   apple: 'AAPL',
   netflix:'NFLX',
   google: 'GOOG',
-  tesla: 'TSLA'
-
+  tesla: 'TSLA',
+  microsoft: 'MSFT',
+  Microsoft: 'MSFT'
 }
 function getStockTickerSymbol(stockName){
     return stock_to_tickers[stockName];
