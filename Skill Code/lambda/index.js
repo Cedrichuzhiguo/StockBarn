@@ -103,7 +103,7 @@ const AddStockToListIntentHandler = {
     },
     async handle(handlerInput){
       console.log("Inside AddStockToListIntentHandler");
-      const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
+      const stockSymbol = getSlotValue(handlerInput, 'stockSymbol');
       console.log(`Now, add ${stockSymbol} to the list`);  
       const stocks = await saveToPersistStockList(handlerInput, stockSymbol);
         
@@ -126,17 +126,17 @@ const CheckStockPriceHandler = {
     const request = handlerInput.requestEnvelope.request;
     console.log("Inside CheckStockPriceHandler");
     console.log(JSON.stringify(request));
-    const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
+    const stockSymbol = getSlotValue(handlerInput, 'stockSymbol');
     
 
     return request.type === "IntentRequest" &&
-           (request.intent.name === "CheckPriceIntent" || (request.intent.name === "AMAZON.YesIntent" && stockSymbol));
+           (request.intent.name === "CheckPriceIntent" && stockSymbol);
   },
   async handle(handlerInput) {
     console.log("Inside CheckStockPriceHandler - handle");
 
     const response = handlerInput.responseBuilder;
-    const stockSymbol = handlerInput.requestEnvelope.request.intent.slots.stockSymbol.value;
+    const stockSymbol = getSlotValue(handlerInput, 'stockSymbol');
 
 
     const priceInfo = await getStockPrice(stockSymbol);
@@ -278,6 +278,12 @@ function setAttribute(handlerInput, name, value){
   if (!value){
     delete attributes[name];
   }
+}
+
+function getSlotValue(handlerInput, slotName){
+  let slots = handlerInput.requestEnvelope.request.intent.slots || {};
+  let slotOfName = slots[slotName] || {} ;
+  return slotOfName.value || null;
 }
 
 const RepeatHandler = {
