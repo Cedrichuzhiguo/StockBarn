@@ -151,6 +151,7 @@ const CheckStockPriceHandler = {
 
     if(true){
       setAttribute(handlerInput, attr_name.REDIRECT_INTENT, 'AddStockToListIntent'); 
+      setAttribute(handlerInput, attr_name.STOCK_SYMBOL, stockSymbol); 
       speakOutput += `Do you also like to add ${stockSymbol} to your list?`;
       response.speak(speakOutput);
       // response.addDelegateDirective({
@@ -239,13 +240,28 @@ const YesIntentHandler = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const redirectIntent = getAttribute(handlerInput, attr_name.REDIRECT_INTENT);
 
+    const stockSymbol = getAttribute(handlerInput, attr_name.STOCK_SYMBOL);
+
+    if(redirectIntent==='AddStockToListIntent' && stockSymbol){
+      saveToPersistStockList(handlerInput, stockSymbol);
+      return handlerInput.responseBuilder
+        .speak('Done!')
+        .getResponse();
+    }
+
     setAttribute(handlerInput, attr_name.REDIRECT_INTENT, null); // reset redirectIntent to empty.
+    //setAttribute(handlerInput, attr_name.STOCK_SYMBOL, null); 
 
     return handlerInput.responseBuilder
       .addDelegateDirective({
         name: redirectIntent,
         confirmationStatus: 'NONE',
-        slots: {}
+        slots: {
+          stockSymbol: {
+            name: 'stockSymbol',
+            value: stockSymbol
+          }
+        }
         })
         .speak('Great.')
         .getResponse();
@@ -366,7 +382,8 @@ const states = {
 };
 
 const attr_name = {
-    REDIRECT_INTENT: 'REDIRECT_INTENT'
+    REDIRECT_INTENT: 'REDIRECT_INTENT',
+    STOCK_SYMBOL: 'STOCK_SYMBOL'
 };
 
 
