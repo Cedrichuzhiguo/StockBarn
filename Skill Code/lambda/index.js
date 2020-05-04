@@ -37,10 +37,11 @@ const HasStockDataLaunchRequestHandler = {
     async handle(handlerInput) {
       const stocks = await getPersistedStockList(handlerInput);
 
-      let stockOutput = await speakPortofolio(stocks, handlerInput); 
+      let stockOutput = await speakPortofolioWithSSML(stocks, handlerInput); 
       //We potentially should consider the progressive responsive if there are too many stocks in the list.
-
-      const speakOutput = `Welcome back. Stock Ninja. Let` + stockOutput;
+      
+      //Simple SSML
+      const speakOutput = `Welcome back Stock Ninja.  <amazon:emotion name="excited" intensity="medium"> Now checking your portofolio:<break time="2s"/> ${stockOutput}  </amazon:emotion> ` ;
 
       return handlerInput.responseBuilder.speak(speakOutput).getResponse();
     }
@@ -182,7 +183,7 @@ const CheckPortofolioIntentHandler = {
         .getResponse();
     }
 
-    let speakOutput = await speakPortofolio(stocks, handlerInput);
+    let speakOutput = await speakPortofolioWithSSML(stocks, handlerInput);
 
     return response.speak(speakOutput)
                    .reprompt(suggestAccountLink)
@@ -190,8 +191,8 @@ const CheckPortofolioIntentHandler = {
   },
 };
 
-async function speakPortofolio(stocks, handlerInput){
-  let speakOutput = `You currently have ${stocks.length} stocks in your portofolio. Here is the current prices:`;
+async function speakPortofolioWithSSML(stocks, handlerInput){
+  let speakOutput = `You currently have ${stocks.length} stocks in your portofolio. Here is the current prices: <break time="1s"/>`;
 
   let stock;
   for (stock of stocks){
