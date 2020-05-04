@@ -197,6 +197,84 @@ async function speakPortfolioWithSSML(stocks, handlerInput){
   return speakOutput;
 }
 
+
+const LinkAccountIntentHandler = {
+
+  canHandle(handlerInput){
+    console.log("BuyIntentHandler: envelope:", handlerInput.requestEnvelope);
+     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+         && Alexa.getIntentName(handlerInput.requestEnvelope) === 'LinkAccountIntent';
+ },
+
+  handle(handlerInput){
+
+    var accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
+
+    if (accessToken == undefined){
+        // The request did not include a token, so tell the user to link
+        var speechText = "I will send an Link Account card to your Alexa mobile app . " +
+                    "Please use the Alexa app on your mobile app. You will need to use your Stock Ninja account credentials.";
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withLinkAccountCard()
+            .getResponse();
+    } else {
+
+      return handlerInput.responseBuilder
+      .speak('You have already linked your account.')
+      .reprompt('If you choose to, the account can also be unlinked on Alexa mobile app.')
+      .withLinkAccountCard()
+      .getResponse();
+
+    }
+  }
+};
+
+
+const BuyIntentHandler = {
+
+  canHandle(handlerInput){
+    console.log("BuyIntentHandler: envelope:", handlerInput.requestEnvelope);
+     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+         && Alexa.getIntentName(handlerInput.requestEnvelope) === 'BuyIntent';
+ },
+
+  handle(handlerInput){
+
+    // This intent requires an access token so that we can get the user's
+    // Ride Hailer user profile with payment information.
+
+    // The access token is in the Context object. Access the
+    // request in the HandlerInput object passed to the
+    // handler.
+
+    var accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
+
+    if (accessToken == undefined){
+        // The request did not include a token, so tell the user to link
+        // accounts and return a LinkAccount card
+        var speechText = "You must have a Stock Ninja account for a stock transaction. " +
+                    "Please use the Alexa app to link your Amazon account with your Stock Ninja Account.";
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withLinkAccountCard()
+            .getResponse();
+    } else {
+
+      return handlerInput.responseBuilder
+      .speak('Now, transaction dialog should start from here')
+      .withLinkAccountCard()
+      .getResponse();
+
+    }
+  }
+};
+
+
+
+
 const ConfirmationIntentHandler = {
   canHandle(handlerInput) {
     console.log("Inside YesIntentHandler");
