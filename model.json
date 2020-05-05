@@ -72,6 +72,7 @@
                         }
                     ],
                     "samples": [
+                        "check {stockSymbol}",
                         "What about {stockSymbol}",
                         "how much is {stockSymbol} ",
                         "please check {stockSymbol}",
