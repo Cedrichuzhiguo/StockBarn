@@ -33,8 +33,10 @@ const LaunchRequestHandler = {
   async handle(handlerInput) {
     const stocks = await getPersistedStockList(handlerInput);
     
+    let profile = await retrieveAccountProfile(handlerInput);
+
     if(stocks.length===0){  
-        const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help with your investment portfolio. For example, I can help you check the price of a stock. You can say, check the price of Amazon.' 
+        const welcomeMessage = 'Hello! Welcome to Stock Ninja! I can help with your investment portfolio. For example, I can help you check the price of a stock. You can say, check the price of Amazon.' 
         const helpMessage = 'You can say, what is the price of Facebook';
     
     
@@ -211,7 +213,7 @@ const LinkAccountIntentHandler = {
 
   handle(handlerInput){
 
-    var accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
+    let accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
 
     if (accessToken == undefined){
         // The request did not include a token, so tell the user to link
@@ -252,7 +254,7 @@ const BuyIntentHandler = {
     // request in the HandlerInput object passed to the
     // handler.
 
-    var accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
+    let accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
 
     if (accessToken == undefined){
         // The request did not include a token, so tell the user to link
@@ -491,6 +493,32 @@ async function saveStockQueryCounter(handlerInput, stockSymbol){
 
 }
 
+//Read from persisted storage, or from profile service call
+async function retrieveAccountProfile(handlerInput){
+  const attributesManager = handlerInput.attributesManager;
+  let persistedAttributes = await attributesManager.getPersistentAttributes() || {};
+
+  console.log('Current persisted Attributes:', persistedAttributes);
+
+  let profile = persistedAttributes.profile;
+
+  let accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
+  if(accessToken){
+      if (!profile){
+        profile = await getAccountProfileWithToken(accessToken);
+      }
+  }else if(profile){ //account unlinked. Time to clear userProfile info
+    profile = null;
+  }
+  persistedAttributes.profile = profile ;
+  attributesManager.setPersistentAttributes(persistedAttributes);
+  await attributesManager.savePersistentAttributes();
+
+  console.log(`Return profile: ${profile}`);
+  return profile;
+}
+
+
 // returns true if the skill is running on a device with a display (show|spot)
 function supportsDisplay(handlerInput) {
   var hasDisplay =
@@ -502,11 +530,6 @@ function supportsDisplay(handlerInput) {
   return hasDisplay;
 }
 
-
-
-function getRandom(min, max) {
-  return Math.floor((Math.random() * ((max - min) + 1)) + min);
-}
 
 
 //Check whether session attribute 'attributeName' has a value 'value'.
@@ -530,9 +553,8 @@ function getStockTickerSymbol(stockName){
     return stock_to_tickers[stockName];
 }
 
-
 //https://finnhub.io/api/v1/quote?symbol=AAPL&token=bqn2eh7rh5re7283jbh0
- function getStockPrice(stockName) {
+async function getStockPrice(stockName) {
     let symbol = getStockTickerSymbol (stockName);
     if (!symbol){
       console.log(`Can not find the symbol for ${stockName}`);
@@ -543,14 +565,47 @@ function getStockTickerSymbol(stockName){
     
     console.log(`Request stock price with ${path}`);
     
-    return new Promise(((resolve, reject) => {
     var options = {
-        host: 'finnhub.io',
-        path: path,
-        method: 'GET',
+      host: 'finnhub.io',
+      path: path,
+      method: 'GET',
     };
 
-    
+    let price = await httpsRequest(options);
+    return price;
+}
+
+
+
+function getAccountProfileWithToken(token){
+
+  if (!token){
+    console.log(`There is no token input.`);
+    return null;
+  }
+  
+  let path = `/api/v1/quote?symbol=${symbol}&token=bqn2eh7rh5re7283jbh0`;
+  
+  console.log(`Request profile: ${path}`);
+  
+  var options = {
+    host: 'stockassistant.auth.us-west-2.amazoncognito.com',
+    path: '/oauth2/userInfo',
+    method: 'GET',
+    headers: {
+      'authorization': 'Bearer ' + token
+  }
+  };
+
+  let profile = await httpsRequest(options);
+  return profile;
+}
+
+
+function httpsRequest(options){
+
+  return new Promise(((resolve, reject) => {
+
     var req = https.request(options, res => {
         res.setEncoding('utf8');
         let responseString = "";
@@ -571,7 +626,7 @@ function getStockTickerSymbol(stockName){
       });
     });
     req.end();
-     }));
+    }));
 }
 
 function compareSlots(slots, value) {
