@@ -33,7 +33,7 @@ const LaunchRequestHandler = {
   async handle(handlerInput) {
     const stocks = await getPersistedStockList(handlerInput);
     
-    let profile = await retrieveAccountProfile(handlerInput);
+    let profile = await retrieveAccountProfile(handlerInput) || {};
 
     let nickname = profile.nickname || '';
 
