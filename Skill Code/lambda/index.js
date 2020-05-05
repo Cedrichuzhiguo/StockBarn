@@ -81,12 +81,6 @@ const AddStockToListIntentHandler = {
         const speakOutput = `${stockSymbol} is added. Now, you have ${stocks.length} in your list in total. `
         return handlerInput.responseBuilder
           .speak(speakOutput)
-      //    .reprompt(helpMessage)
-       /*   .addDelegateDirective({
-              name: 'AddStockToListIntent',
-              confirmationStatus: 'NONE',
-              slots: {}
-              })*/
           .getResponse();
         }
 }
@@ -137,7 +131,7 @@ const CheckStockPriceHandler = {
       //   }
       //   })
     }else{
-       response.speak(speakOutput);
+       response.speak(speakOutput).reprompt('You can also add your stock to the list, so that I can remember it for you.');
     }
 
     return response.getResponse();
@@ -274,8 +268,6 @@ const BuyIntentHandler = {
 };
 
 
-
-
 const ConfirmationIntentHandler = {
   canHandle(handlerInput) {
     console.log("Inside YesIntentHandler");
@@ -295,7 +287,7 @@ const ConfirmationIntentHandler = {
       if (redirectIntent){
         setAttribute(handlerInput, attr_name.REDIRECT_INTENT, null); // reset redirectIntent to empty.
         setAttribute(handlerInput, attr_name.STOCK_SYMBOL, null); 
-        return response.speak('OK. Anything else?').getResponse();
+        return response.speak('OK. Anything else?').reprompt(exitSkillMessage).getResponse();
       }else{
         return response.speak(exitSkillMessage).getResponse();
       }
