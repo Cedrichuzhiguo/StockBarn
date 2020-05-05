@@ -307,6 +307,7 @@ const ConfirmationIntentHandler = {
       saveToPersistStockList(handlerInput, stockSymbol);
       return handlerInput.responseBuilder
         .speak('Done!')
+        .reprompt('Anything else?')
         .getResponse();
     }
 
