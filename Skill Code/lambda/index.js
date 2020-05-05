@@ -56,7 +56,7 @@ const LaunchRequestHandler = {
 
     
     //  //Simple SSML
-    let speakOutput = `<amazon:emotion name="excited" intensity="medium">  Hello ${nickname}, welcome back Stock Ninja. Now checking your portfolio:<break time="1s"/> ${stockOutput}  </amazon:emotion> ` ;
+    let speakOutput = `<amazon:emotion name="excited" intensity="medium">  Hello ${nickname}, welcome back! Stock Ninja is now checking your portfolio:<break time="1s"/> ${stockOutput}  </amazon:emotion> ` ;
 
     
     return handlerInput.responseBuilder.speak(speakOutput).reprompt(suggestAccountLink).getResponse();
@@ -224,6 +224,7 @@ const LinkAccountIntentHandler = {
 
         return handlerInput.responseBuilder
             .speak(speechText)
+            .reprompt('You can link account whenever you want.')
             .withLinkAccountCard()
             .getResponse();
     } else {
@@ -248,13 +249,6 @@ const BuyIntentHandler = {
  },
 
   handle(handlerInput){
-
-    // This intent requires an access token so that we can get the user's
-    // Ride Hailer user profile with payment information.
-
-    // The access token is in the Context object. Access the
-    // request in the HandlerInput object passed to the
-    // handler.
 
     let accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
 
@@ -517,7 +511,7 @@ async function retrieveAccountProfile(handlerInput){
 
   console.log('Current persisted Attributes:', persistedAttributes);
 
-  let profile = persistedAttributes.profile;
+  let profile = persistedAttributes.profile || null;
 
   let accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
   if(accessToken){
@@ -561,8 +555,10 @@ const stock_to_tickers = {
   amazon: 'AMZN',
   apple: 'AAPL',
   netflix:'NFLX',
+  Netflix: 'NFLX',
   google: 'GOOG',
   tesla: 'TSLA',
+  Tesla: 'TSLA',
   microsoft: 'MSFT',
   Microsoft: 'MSFT'
 }

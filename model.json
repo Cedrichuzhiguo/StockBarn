@@ -121,6 +121,7 @@
                             "name": "priceDollar",
                             "type": "AMAZON.NUMBER",
                             "samples": [
+                                "{priceDollar}",
                                 "{priceDollar} point {priceCents} USD",
                                 "{priceDollar} dot {priceCents}",
                                 "No more than {priceDollar} dollar and {priceCents} cents",
@@ -162,6 +163,15 @@
                 {
                     "name": "STOCK_SYMBOL",
                     "values": [
+                        {
+                            "id": "NFLX",
+                            "name": {
+                                "value": "netflix",
+                                "synonyms": [
+                                    "nflx"
+                                ]
+                            }
+                        },
                         {
                             "id": "GOOG",
                             "name": {
@@ -412,7 +422,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "OK. The order is,  {stockSymbol} , {amount} shares, at  {priceDollar} . {priceCents} USD "
+                        "value": "OK. The order is,  {stockSymbol} , {amount} shares, at  {priceDollar}  USD, should we proceed?"
                     }
                 ]
             }
