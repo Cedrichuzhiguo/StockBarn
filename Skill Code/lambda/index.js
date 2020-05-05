@@ -74,7 +74,7 @@ const AddStockToListIntentHandler = {
     async handle(handlerInput){
       console.log("Inside AddStockToListIntentHandler");
       const stockSymbol = getSlotValue(handlerInput, 'stockSymbol');
-      const stocks = await getPersistedStockList(handlerInput);
+      let stocks = await getPersistedStockList(handlerInput);
       if(stocks.includes(stockSymbol)){
         return handlerInput.responseBuilder
         .speak(`Actually, you already had ${stockSymbol} in your list.`)

@@ -137,6 +137,7 @@
                         }
                     ],
                     "samples": [
+                        "buy {stockSymbol}",
                         "buy stocks",
                         "buy {amount} of {stockSymbol} at {priceDollar} dollar",
                         "buy {amount} of {stockSymbol}",
@@ -422,7 +423,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "OK. The order is,  {stockSymbol} , {amount} shares, at  {priceDollar}  USD, should we proceed?"
+                        "value": "OK. The order is,  {stockSymbol} , {amount} shares, at  {priceDollar}  USD , should we proceed?"
                     }
                 ]
             }
