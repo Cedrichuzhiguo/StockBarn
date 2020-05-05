@@ -34,7 +34,7 @@ const LaunchRequestHandler = {
     const stocks = await getPersistedStockList(handlerInput);
     
     if(stocks.length===0){  
-        const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help with your investment portofolio. For example, I can help you check the price of a stock. You can say, check the price of Amazon.' 
+        const welcomeMessage = 'Hello! Welcome to Stock Ninja! I help with your investment portfolio. For example, I can help you check the price of a stock. You can say, check the price of Amazon.' 
         const helpMessage = 'You can say, what is the price of Facebook';
     
     
@@ -52,7 +52,7 @@ const LaunchRequestHandler = {
 
     
     //  //Simple SSML
-    let speakOutput = `<amazon:emotion name="excited" intensity="medium">  Welcome back Stock Ninja. Now checking your portofolio:<break time="1s"/> ${stockOutput}  </amazon:emotion> ` ;
+    let speakOutput = `<amazon:emotion name="excited" intensity="medium">  Welcome back Stock Ninja. Now checking your portfolio:<break time="1s"/> ${stockOutput}  </amazon:emotion> ` ;
 
     
     return handlerInput.responseBuilder.speak(speakOutput).reprompt(suggestAccountLink).getResponse();
@@ -212,8 +212,8 @@ const LinkAccountIntentHandler = {
 
     if (accessToken == undefined){
         // The request did not include a token, so tell the user to link
-        var speechText = "I will send an Link Account card to your Alexa mobile app . " +
-                    "Please use the Alexa app on your mobile app. You will need to use your Stock Ninja account credentials.";
+        var speechText = "I am sending an Account Linking card to your Alexa mobile app. " +
+                    "Please check the Alexa app on your mobile app. Your Stock Ninja login credentials is required.";
 
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -404,7 +404,7 @@ const attr_name = {
 const suggestAccountLink = 'Do you think I\'m helpful enough? I can help you even more, if you link with a Stock Ninja account.';
 const exitSkillMessage = `Thank you for using stock ninja! You'll make a lot money soon!`;
 const promptForAddingStock = `To add a stock, you can say Amazon, or A-M-Z-N`;
-const helpMessage = `I am stock ninja, help you manage your portofolio. For example, you can ask, check price of amazon.`;
+const helpMessage = `I am stock ninja, help you manage your portfolio. For example, you can ask, check price of amazon.`;
 
 
 /* HELPER FUNCTIONS */
@@ -594,6 +594,8 @@ new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTEN
     AddStockToListIntentHandler,
     CheckStockPriceHandler,
     CheckPortfolioIntentHandler,
+    BuyIntentHandler,
+    LinkAccountIntentHandler,
     ConfirmationIntentHandler,
     HelpHandler,
     ExitHandler,

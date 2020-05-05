@@ -83,6 +83,7 @@
                     "name": "CheckPortfolioIntent",
                     "slots": [],
                     "samples": [
+                        "check ninja portfolio",
                         "check my portfolio",
                         "check portfolio",
                         "check prices",
@@ -96,6 +97,56 @@
                 {
                     "name": "AMAZON.NoIntent",
                     "samples": []
+                },
+                {
+                    "name": "BuyIntent",
+                    "slots": [
+                        {
+                            "name": "stockSymbol",
+                            "type": "STOCK_SYMBOL",
+                            "samples": [
+                                "{stockSymbol}",
+                                "I want to buy {stockSymbol}"
+                            ]
+                        },
+                        {
+                            "name": "amount",
+                            "type": "AMAZON.NUMBER",
+                            "samples": [
+                                "buy {amount}",
+                                "{amount}"
+                            ]
+                        },
+                        {
+                            "name": "price",
+                            "type": "AMAZON.NUMBER",
+                            "samples": [
+                                "at {price}",
+                                "{price} dollar",
+                                "{price}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "buy {amount} of {stockSymbol} at {price}",
+                        "buy {amount} of {stockSymbol}",
+                        "buy {stockSymbol} at {price} USD",
+                        "purchase stock",
+                        "help me buy {stockSymbol}",
+                        "buy {stockSymbol} stock",
+                        "I want to buy {stockSymbol}"
+                    ]
+                },
+                {
+                    "name": "LinkAccountIntent",
+                    "slots": [],
+                    "samples": [
+                        "link my stock ninja account",
+                        "add my stock ninja account",
+                        "please add my account",
+                        "link account please",
+                        "I want to link the account"
+                    ]
                 }
             ],
             "types": [
@@ -214,6 +265,43 @@
                             ]
                         }
                     ]
+                },
+                {
+                    "name": "BuyIntent",
+                    "delegationStrategy": "ALWAYS",
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.242325475676"
+                    },
+                    "slots": [
+                        {
+                            "name": "stockSymbol",
+                            "type": "STOCK_SYMBOL",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.242325475676.41956890931"
+                            }
+                        },
+                        {
+                            "name": "amount",
+                            "type": "AMAZON.NUMBER",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.242325475676.436235726518"
+                            }
+                        },
+                        {
+                            "name": "price",
+                            "type": "AMAZON.NUMBER",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.242325475676.963381656821"
+                            }
+                        }
+                    ]
                 }
             ],
             "delegationStrategy": "ALWAYS"
@@ -269,6 +357,46 @@
                     {
                         "type": "PlainText",
                         "value": "Got it, {stockSymbol}"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.242325475676.41956890931",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "which one?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "which stock do you want to buy"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.242325475676.436235726518",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "How many?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.242325475676.963381656821",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "How much"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.242325475676",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "OK. send out order for {stockSymbol} , {amount} share, at {price} USD"
                     }
                 ]
             }
