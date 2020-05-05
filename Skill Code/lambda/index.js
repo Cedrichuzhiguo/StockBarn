@@ -35,8 +35,10 @@ const LaunchRequestHandler = {
     
     let profile = await retrieveAccountProfile(handlerInput);
 
+    let nickname = profile.nickname || '';
+
     if(stocks.length===0){  
-        const welcomeMessage = 'Hello! Welcome to Stock Ninja! I can help with your investment portfolio. For example, I can help you check the price of a stock. You can say, check the price of Amazon.' 
+        const welcomeMessage = `Hello ${nickname}! Welcome to Stock Ninja! I can help with your investment portfolio. For example, I can help you check the price of a stock. You can say, check the price of Amazon.` 
         const helpMessage = 'You can say, what is the price of Facebook';
     
     
@@ -54,7 +56,7 @@ const LaunchRequestHandler = {
 
     
     //  //Simple SSML
-    let speakOutput = `<amazon:emotion name="excited" intensity="medium">  Welcome back Stock Ninja. Now checking your portfolio:<break time="1s"/> ${stockOutput}  </amazon:emotion> ` ;
+    let speakOutput = `<amazon:emotion name="excited" intensity="medium">  Hello ${nickname}, welcome back Stock Ninja. Now checking your portfolio:<break time="1s"/> ${stockOutput}  </amazon:emotion> ` ;
 
     
     return handlerInput.responseBuilder.speak(speakOutput).reprompt(suggestAccountLink).getResponse();
@@ -493,7 +495,22 @@ async function saveStockQueryCounter(handlerInput, stockSymbol){
 
 }
 
-//Read from persisted storage, or from profile service call
+/*
+Read from persisted storage, or from profile service call
+The success profile looks like:
+{
+    "sub": "cb648136-7010-4335-bf5d-446234d9613f",
+    "address": "10 Langbourne Place, Toronto, Canada",
+    "email_verified": "true",
+    "nickname": "Cedric",
+    "phone_number_verified": "true",
+    "phone_number": "+16043532272",
+    "email": "cedric.huzhiguo@gmail.com",
+    "username": "cedric"
+}
+
+
+*/
 async function retrieveAccountProfile(handlerInput){
   const attributesManager = handlerInput.attributesManager;
   let persistedAttributes = await attributesManager.getPersistentAttributes() || {};
@@ -577,16 +594,11 @@ async function getStockPrice(stockName) {
 
 
 
-function getAccountProfileWithToken(token){
-
+async function getAccountProfileWithToken(token){
+  console.log(`Get account with token: ${token}.`);
   if (!token){
-    console.log(`There is no token input.`);
     return null;
   }
-  
-  let path = `/api/v1/quote?symbol=${symbol}&token=bqn2eh7rh5re7283jbh0`;
-  
-  console.log(`Request profile: ${path}`);
   
   var options = {
     host: 'stockassistant.auth.us-west-2.amazoncognito.com',
