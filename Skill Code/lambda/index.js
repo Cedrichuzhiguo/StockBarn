@@ -197,7 +197,10 @@ async function speakPortfolioWithSSML(stocks, handlerInput){
   return speakOutput;
 }
 
+/*
+Account linking using cognito: https://medium.com/@ankit81008/alexa-accountlinking-cognito-74a29243b1ca
 
+*/
 const LinkAccountIntentHandler = {
 
   canHandle(handlerInput){

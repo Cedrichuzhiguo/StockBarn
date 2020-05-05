@@ -118,19 +118,28 @@
                             ]
                         },
                         {
-                            "name": "price",
+                            "name": "priceDollar",
                             "type": "AMAZON.NUMBER",
                             "samples": [
-                                "at {price}",
-                                "{price} dollar",
-                                "{price}"
+                                "{priceDollar} point {priceCents} USD",
+                                "{priceDollar} dot {priceCents}",
+                                "No more than {priceDollar} dollar and {priceCents} cents",
+                                "price would be {priceDollar} dollar {priceCents} USD",
+                                "at {priceDollar} dollar and {priceCents} cents",
+                                "{priceDollar} dollar",
+                                "{priceDollar} USD"
                             ]
+                        },
+                        {
+                            "name": "priceCents",
+                            "type": "AMAZON.NUMBER"
                         }
                     ],
                     "samples": [
-                        "buy {amount} of {stockSymbol} at {price}",
+                        "buy stocks",
+                        "buy {amount} of {stockSymbol} at {priceDollar} dollar",
                         "buy {amount} of {stockSymbol}",
-                        "buy {stockSymbol} at {price} USD",
+                        "buy {amount} at {priceDollar} point {priceCents} USD",
                         "purchase stock",
                         "help me buy {stockSymbol}",
                         "buy {stockSymbol} stock",
@@ -293,13 +302,20 @@
                             }
                         },
                         {
-                            "name": "price",
+                            "name": "priceDollar",
                             "type": "AMAZON.NUMBER",
                             "confirmationRequired": false,
                             "elicitationRequired": true,
                             "prompts": {
                                 "elicitation": "Elicit.Slot.242325475676.963381656821"
                             }
+                        },
+                        {
+                            "name": "priceCents",
+                            "type": "AMAZON.NUMBER",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
                         }
                     ]
                 }
@@ -387,7 +403,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "How much"
+                        "value": "At what price?"
                     }
                 ]
             },
@@ -396,7 +412,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "OK. send out order for {stockSymbol} , {amount} share, at {price} USD"
+                        "value": "OK. The order is,  {stockSymbol} , {amount} shares, at  {priceDollar} . {priceCents} USD "
                     }
                 ]
             }
